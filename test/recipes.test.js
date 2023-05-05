@@ -125,4 +125,55 @@ describe('test the recipes API', () => {
       );
     });
   });
+
+  // test create recipes
+  describe('POST /recipes', () => {
+    it('it should save new recipe to db', async () => {
+      // DO YOU WANT TO SAVE TO DB
+      const recipes = {
+        name: 'rajma',
+        difficulty: 2,
+        vegetarian: true,
+      };
+
+      const res = await request(app)
+        .post('/recipes')
+        .send(recipes)
+        .set('Authorization', `Bearer ${token}`);
+
+      expect(res.statusCode).toEqual(201);
+      expect(res.body).toEqual(
+        expect.objectContaining({
+          success: true,
+          data: expect.any(Object),
+        }),
+      );
+
+      // eslint-disable-next-line no-underscore-dangle
+      id = res.body.data._id;
+    });
+
+    it('it should not save new recipe to db, invalid vegetarian value', async () => {
+      // DATA YOU WANT TO SAVE TO DB
+
+      const recipe = {
+        name: 'rajma',
+        difficulty: 2,
+        vegetarian: 'true',
+      };
+
+      const res = await request(app)
+        .post('/recipes')
+        .send(recipe)
+        .set('Authorization', `Bearer ${token}`);
+
+      expect(res.statusCode).toEqual(400);
+      expect(res.body).toEqual(
+        expect.objectContaining({
+          success: false,
+          message: 'vegetarian field should be boolean',
+        }),
+      );
+    });
+  });
 });

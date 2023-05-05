@@ -175,5 +175,66 @@ describe('test the recipes API', () => {
         }),
       );
     });
+
+    it('it should not save new recipe to db, empty name field', async () => {
+      const recipe = {
+        difficulty: 3,
+        vegetarian: true,
+      };
+
+      const res = await request(app)
+        .post('/recipes')
+        .send(recipe)
+        .set('Authorization', `Bearer ${token}`);
+
+      expect(res.statusCode).toEqual(400);
+      expect(res.body).toEqual(
+        expect.objectContaining({
+          success: false,
+          message: 'name field can not be empty',
+        }),
+      );
+    });
+
+    it('it should not save new recipe to db, invalid diffculty field', async () => {
+      const recipe = {
+        name: 'rajma',
+        difficulty: '3',
+        vegetarian: true,
+      };
+
+      const res = await request(app)
+        .post('/recipes')
+        .send(recipe)
+        .set('Authorization', `Bearer ${token}`);
+
+      expect(res.statusCode).toEqual(400);
+      expect(res.body).toEqual(
+        expect.objectContaining({
+          success: false,
+          message: 'difficulty field should be a number',
+        }),
+      );
+    });
+
+    it('it should not save new recipe to db, invalid token', async () => {
+      const recipe = {
+        name: 'rajma',
+        difficulty: 3,
+        vegetarian: true,
+      };
+
+      const res = await request(app)
+        .post('/recipes')
+        .send(recipe)
+        .set('Authorization', 'Bearer qwertuop');
+
+      expect(res.statusCode).toEqual(403)
+      expect(res.body).toEqual(
+        expect.objectContaining({
+          message: 'Unauthorized',
+        }),
+      );
+    });
   });
 });

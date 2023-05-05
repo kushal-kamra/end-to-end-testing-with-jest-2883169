@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 const request = require('supertest');
 const bcrypt = require('bcrypt');
 const app = require('../index');
@@ -64,6 +65,62 @@ describe('test the recipes API', () => {
         expect.objectContaining({
           success: false,
           message: 'username or password can not be empty',
+        }),
+      );
+    });
+
+    it('do not sign him in, username field cannot be empty', async () => {
+      const user = {
+        password: 'okay',
+      };
+
+      const res = await request(app)
+        .post('/login')
+        .send(user);
+
+      expect(res.statusCode).toEqual(400);
+      expect(res.body).toEqual(
+        expect.objectContaining({
+          success: false,
+          message: 'username or password can not be empty',
+        }),
+      );
+    });
+
+    it('do not sign him in, username does not exist', async () => {
+      const user = {
+        username: 'chii',
+        password: 'okay',
+      };
+
+      const res = await request(app)
+        .post('/login')
+        .send(user);
+
+      expect(res.statusCode).toEqual(400);
+      expect(res.body).toEqual(
+        expect.objectContaining({
+          success: false,
+          message: 'Incorrect username or password',
+        }),
+      );
+    });
+
+    it('do not sign him in, incorrect password', async () => {
+      const user = {
+        username: 'admin',
+        password: 'okay1',
+      };
+
+      const res = await request(app)
+        .post('/login')
+        .send(user);
+
+      expect(res.statusCode).toEqual(400);
+      expect(res.body).toEqual(
+        expect.objectContaining({
+          success: false,
+          message: 'Incorrect username or password',
         }),
       );
     });

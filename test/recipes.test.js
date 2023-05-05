@@ -49,5 +49,23 @@ describe('test the recipes API', () => {
         }),
       );
     });
+
+    it('do not sign him in, password cannot be empty', async () => {
+      const user = {
+        username: 'admin',
+      };
+
+      const res = await request(app)
+        .post('/login')
+        .send(user);
+
+      expect(res.statusCode).toEqual(400);
+      expect(res.body).toEqual(
+        expect.objectContaining({
+          success: false,
+          message: 'username or password can not be empty',
+        }),
+      );
+    });
   });
 });

@@ -3,3 +3,7 @@ node_modules
 .tmp
 npm-debug.log
 .env
+
+coverage
+*.lcov
+.nyc_output

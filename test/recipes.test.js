@@ -531,5 +531,22 @@ describe('test the recipes API', () => {
         }),
       );
     });
+
+    it('Fail to delete specified recipe, invalid token', async () => {
+      jest.spyOn(RecipeService, 'fetchByIdAndDelete')
+        .mockRejectedValueOnce(new Error());
+
+      const res = await request(app)
+        .delete(`/recipes/${id}`)
+        .set('Authorization', `Bearer ${token}`);
+
+      expect(res.statusCode).toEqual(500);
+      expect(res.body).toEqual(
+        expect.objectContaining({
+          success: false,
+          message: 'An error occured while deleting recipe',
+        }),
+      );
+    });
   });
 });

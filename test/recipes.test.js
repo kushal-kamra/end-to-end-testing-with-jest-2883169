@@ -5,6 +5,7 @@ const app = require('../index');
 const User = require('../database/models/users');
 const mongoose = require('../database/dbConection');
 const UserService = require('../database/services/users');
+const RecipeService = require('../database/services/recipes');
 
 let id;
 let token;
@@ -260,6 +261,32 @@ describe('test the recipes API', () => {
         }),
       );
     });
+
+    it('it should not save new recipe to db, internal server error', async () => {
+      // data you want to save to db
+
+      const recipes = {
+        name: 'chichen nuggets',
+        difficulty: 2,
+        vegetarian: true,
+      };
+
+      jest.spyOn(RecipeService, 'saveRecipes')
+        .mockRejectedValueOnce(new Error());
+
+      const res = await request(app)
+        .post('/recipes')
+        .send(recipes)
+        .set('Authorization', `Bearer ${token}`);
+
+      expect(res.statusCode).toEqual(500);
+      expect(res.body).toEqual(
+        expect.objectContaining({
+          success: false,
+          message: 'Failed to save recipes!',
+        }),
+      );
+    });
   });
 
   // test get all recipe
@@ -293,7 +320,7 @@ describe('test the recipes API', () => {
       );
     });
 
-    it('it should not retrieve any recipe from db, invalid id passes', async () => {
+    it('it should not retrieve any recipe from db, invalid id passed', async () => {
       const res = await request(app)
         .get('/recipes/sjsdjhdshjhjds');
 

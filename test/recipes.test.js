@@ -504,7 +504,7 @@ describe('test the recipes API', () => {
   });
 
   // test delete endpoint
-  describe('/DELETE /recipe/:id', () => {
+  describe('DELETE /recipe/:id', () => {
     it('Delete the specified recipe', async () => {
       const res = await request(app)
         .delete(`/recipes/${id}`)

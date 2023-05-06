@@ -373,7 +373,7 @@ describe('test the recipes API', () => {
         name: 'rajma',
       };
 
-      // const res = await request(app)
+      const res = await request(app)
         .patch(`/recipes/${id}`)
         .send(recipes)
         .set('Authorization', `Bearer ${token}`);

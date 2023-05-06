@@ -303,6 +303,22 @@ describe('test the recipes API', () => {
         }),
       );
     });
+
+    it('it should not retrieve all recipes in the db, internal server error', async () => {
+      jest.spyOn(RecipeService, 'allRecipes')
+        .mockRejectedValueOnce(new Error());
+
+      const res = await request(app)
+        .get('/recipes');
+
+      expect(res.statusCode).toEqual(500);
+      expect(res.body).toEqual(
+        expect.objectContaining({
+          success: false,
+          message: 'Some error occurred while retrieving recipes.',
+        }),
+      );
+    });
   });
 
   // test a particular recipe

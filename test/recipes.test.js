@@ -4,6 +4,7 @@ const bcrypt = require('bcrypt');
 const app = require('../index');
 const User = require('../database/models/users');
 const mongoose = require('../database/dbConection');
+const UserService = require('../database/services/users');
 
 let id;
 let token;
@@ -121,6 +122,29 @@ describe('test the recipes API', () => {
         expect.objectContaining({
           success: false,
           message: 'Incorrect username or password',
+        }),
+      );
+    });
+
+    it('do not sign him in, internal server error', async () => {
+      // data you want to save to db
+      const user = {
+        username: 'admin',
+        password: 'okay',
+      };
+
+      jest.spyOn(UserService, 'findByUsername')
+        .mockRejectedValueOnce(new Error());
+
+      const res = await request(app)
+        .post('/login')
+        .send(user);
+
+      expect(res.statusCode).toEqual(500);
+      expect(res.body).toEqual(
+        expect.objectContaining({
+          success: false,
+          message: 'login failed.',
         }),
       );
     });
@@ -284,7 +308,7 @@ describe('test the recipes API', () => {
   });
 
   // test update endpoint
-  describe('PATCH/recipes/:id', () => {
+  describe('PATCH /recipes/:id', () => {
     it('update the recipe record in db', async () => {
       const recipes = {
         name: 'rajma',

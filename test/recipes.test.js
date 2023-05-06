@@ -282,4 +282,119 @@ describe('test the recipes API', () => {
       );
     });
   });
+
+  // test update endpoint
+  describe('PATCH/recipes/:id', () => {
+    it('update the recipe record in db', async () => {
+      const recipes = {
+        name: 'rajma',
+      };
+
+      const res = await request(app)
+        .patch(`/recipes/${id}`)
+        .send(recipes)
+        .set('Authorization', `Bearer ${token}`);
+
+      expect(res.statusCode).toEqual(200);
+      expect(res.body).toEqual(
+        expect.objectContaining({
+          success: true,
+          data: expect.any(Object),
+        }),
+      );
+    });
+
+    it('it should not update recipe in db, with invalid difficulty value', async () => {
+      const recipe = {
+        name: 'jollof rice',
+        difficulty: '2',
+      };
+
+      const res = await request(app)
+        .patch(`/recipes/${id}`)
+        .send(recipe)
+        .set('Authorization', `Bearer ${token}`);
+
+      expect(res.statusCode).toEqual(400);
+      expect(res.body).toEqual(
+        expect.objectContaining({
+          success: false,
+          message: 'difficulty field should be a number',
+        }),
+      );
+    });
+
+    it('it should not update recipe in db, with invalid vegetarian value', async () => {
+      const recipe = {
+        difficulty: 3,
+        vegetarian: 'true',
+      };
+
+      const res = await request(app)
+        .patch(`/recipes/${id}`)
+        .send(recipe)
+        .set('Authorization', `Bearer ${token}`);
+
+      expect(res.statusCode).toEqual(400);
+      expect(res.body).toEqual(
+        expect.objectContaining({
+          success: false,
+          message: 'vegetarian field should be boolean',
+        }),
+      );
+    });
+
+    it('it should not update recipe in db, with invalid recipe id passed', async () => {
+      const recipe = {
+        difficulty: 3,
+      };
+
+      const res = await request(app)
+        .patch('/recipes/asndnhhndhd')
+        .send(recipe)
+        .set('Authorization', `Bearer ${token}`);
+
+      expect(res.statusCode).toEqual(400);
+      expect(res.body).toEqual(
+        expect.objectContaining({
+          success: false,
+          message: 'Recipe with id asndnhhndhd does not exist',
+        }),
+      );
+    });
+
+    it('it should not update recipe in db, with invalid token', async () => {
+      const recipe = {
+        name: 'rajma',
+      };
+
+      const res = await request(app)
+        .patch(`/recipes/${id}`)
+        .send(recipe)
+        .set('Authorization', 'Bearer skdkjdjkjdjd');
+
+      expect(res.statusCode).toEqual(403);
+      expect(res.body).toEqual(
+        expect.objectContaining({
+          message: 'Unauthorized',
+        }),
+      );
+    });
+
+    it('it should not update recipe in db, with no updates passed', async () => {
+      const recipe = {};
+
+      const res = await request(app)
+        .patch(`/recipes/${id}`)
+        .send(recipe)
+        .set('Authorization', `Bearer ${token}`);
+
+      expect(res.statusCode).toEqual(400);
+      expect(res.body).toEqual(
+        expect.objectContaining({
+          message: 'field should not be empty',
+        }),
+      );
+    });
+  });
 });

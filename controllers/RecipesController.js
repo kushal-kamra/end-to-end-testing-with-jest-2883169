@@ -98,7 +98,6 @@ const RecipesController = {
 
   // Update the recipes identified by the parameter
   update: async (req, res) => {
-    console.log('update');
     try {
       // check if req body is empty
       if (Object.keys(req.body).length === 0) {

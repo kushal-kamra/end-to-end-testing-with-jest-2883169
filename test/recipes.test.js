@@ -479,6 +479,28 @@ describe('test the recipes API', () => {
         }),
       );
     });
+
+    it('it should not update recipe in db, internal server error', async () => {
+      jest.spyOn(RecipeService, 'fetchByIdAndUpdate')
+        .mockRejectedValueOnce(new Error());
+
+      const recipes = {
+        name: 'rajma',
+      };
+
+      const res = await request(app)
+        .patch(`/recipes/${id}`)
+        .send(recipes)
+        .set('Authorization', `Bearer ${token}`);
+
+      expect(res.statusCode).toEqual(500);
+      expect(res.body).toEqual(
+        expect.objectContaining({
+          success: false,
+          message: 'An error occured while updating recipe',
+        }),
+      );
+    });
   });
 
   // test delete endpoint
